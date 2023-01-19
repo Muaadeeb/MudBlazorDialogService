@@ -1,0 +1,34 @@
+﻿@page "/useCasePassingServerDataDisplayAsTable"
+
+<h3>UseCasePassingServerDataAndDelete</h3>
+
+@using MudBlazorServer.Models
+
+@inject IDialogService _dialogService
+
+<MudItem>
+    <MudChip Color="Color.Primary">Add Item from Lookup Table</MudChip>
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" @onclick="OpenDialog"/>
+</MudItem>
+<MudItem>
+    <MudChip Color="Color.Primary">The Item Selected Was: </MudChip>
+    <MudTextField @bind-Value="Id"></MudTextField>
+</MudItem>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    public int Id { get; set; }
+
+    private async Task OpenDialog()
+    {
+        var options = new DialogOptions() { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true};
+        var dialog = _dialogService.Show<Dialog1Component>(string.Empty, options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            Int32.TryParse(result.Data.ToString(), out int inventoryId);
+            Id = inventoryId;
+        }
+    }
+}

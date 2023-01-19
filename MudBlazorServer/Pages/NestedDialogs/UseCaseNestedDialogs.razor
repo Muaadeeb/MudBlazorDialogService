@@ -2,7 +2,7 @@
 
 <h3>UseCaseNestedDialogs</h3>
 
-@inject IDialogService DialogService
+@inject IDialogService _dialogService
 
 <MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
     Open Simple Dialog
@@ -11,6 +11,6 @@
     private void OpenDialog()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<Dialog1Component>("First Level Dialog", options);
+        var dialog =_dialogService.Show<Dialog1Component>("First Level Dialog", options);
     }
 }

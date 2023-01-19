@@ -1,0 +1,28 @@
+﻿@using MudBlazorServer.Models
+<MudDialog>
+    <DialogContent>
+
+        <MudText>Id: @Inventory.Id</MudText>
+        <MudText>Item: @Inventory.Item</MudText>
+        <MudText>Description: @Inventory.Description</MudText>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Submit">Submit</MudButton>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="CancelAll">Close All</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public Inventory Inventory { get; set; } = null!;
+
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(@Inventory.Id));
+    void Cancel() => MudDialog.Cancel();
+
+    private void CancelAll()
+    {
+        MudDialog.CancelAll();
+    }
+}

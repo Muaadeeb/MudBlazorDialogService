@@ -1,0 +1,131 @@
+﻿@using MudBlazorServer.Models
+@inject IDialogService _dialogService
+
+<MudDialog DisableSidePadding="true">
+    <TitleContent>
+        <MudContainer Class="d-flex align-content-center justify-center  mud-width-full py-8">Inventory Lookup</MudContainer>
+        
+    </TitleContent>
+    <DialogContent>
+        <MudItem>
+            <MudPaper Class="d-flex align-content-center justify-center  mud-width-full py-8">
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField @bind-Value="SearchValue" Label="Search for a Book" Variant="Variant.Text" MaxLength="32" FullWidth="true" Style="padding-right: 15px"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GetData"> Search</MudButton>
+                </MudItem>
+            </MudPaper>
+        </MudItem>
+
+        @if (HasData)
+        {
+            <MudItem>
+                <MudTable Items="@Inventory" SortLabel="Sort By" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ? "600px" : "")" Outlined="true" Virtualize="true" Hover="true" Dense="true" Bordered="true" Striped="true" Breakpoint="Breakpoint.Sm" Filter="new Func<Inventory, bool>(GetFilterItem)">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6">User Details</MudText>
+                        <MudSpacer/>
+                        <MudItem>
+                            <MudTextField @bind-Value="searchItem" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"></MudTextField>
+                        </MudItem>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Select</MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inventory, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inventory, object>(x => x.Item)">Item</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inventory, object>(x => x.Description)">Description</MudTableSortLabel></MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>
+                            <MudTooltip Text="Select">
+                                <MudIconButton @onclick="() => OpenSecondDialog(context)" Icon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"/>
+                            </MudTooltip>
+                        </MudTd>
+                        <MudTd DataLabel="Id">@context.Id</MudTd>
+                        <MudTd DataLabel="Item">@context.Item</MudTd>
+                        <MudTd DataLabel="Descirption" Style="white-space: nowrap;">@context.Description</MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager PageSizeOptions="new int[] { 5, 10, 20 }"/>
+                    </PagerContent>
+                </MudTable>
+                <MudSwitch @bind-Checked="@fixed_header">Fixed Header</MudSwitch>
+                <MudSwitch @bind-Checked="@fixed_footer">Fixed Footer</MudSwitch>
+            </MudItem>
+        }
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        @*<MudButton Color="Color.Primary" OnClick="OpenSecondDialog(context)">Open Second Dialog</MudButton>*@
+    </DialogActions>
+</MudDialog>
+@code {
+    //TODO: Change table size, add in scroll bars...formatting.
+
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    public string SearchValue { get; set; } = null!;
+    public bool HasData { get; set; }
+    private bool fixed_header = true;
+    private bool fixed_footer = false;
+    private string searchItem = string.Empty;
+
+
+    public List<Inventory> Inventory { get; } = new List<Inventory>
+    {
+        new Inventory{ Id = 1, Item = "Book1", Description = "Guide to Denmark" },
+        new Inventory{ Id = 2, Item = "Book2", Description = "Guide to Sweden" },
+        new Inventory{ Id = 3, Item = "Book3", Description = "Guide to Russia" },
+        new Inventory{ Id = 4, Item = "Book4", Description = "Guide to Germany" }
+    };
+
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task OpenSecondDialog(Inventory inventory)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Inventory", inventory );
+
+        var options = new DialogOptions() { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<Dialog2Component>("Select your book.", parameters, options);
+
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            MudDialog.Close(DialogResult.Ok(result.Data));
+        }
+
+    }
+
+    private async Task GetData()
+    {
+        HasData = false;
+        var result = Inventory.Where(x => x.Item.Contains(SearchValue)).ToList();
+        
+        if (result.Any())
+        {
+            HasData = true;
+        }
+    }
+
+    private bool GetFilterItem(Inventory inventory)
+    {
+        return FindFilterItem(inventory, searchItem);
+    }
+
+    private bool FindFilterItem(Inventory inventory, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (!string.IsNullOrEmpty(inventory.Item) && inventory.Item.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (!string.IsNullOrEmpty(inventory.Description) && inventory.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{inventory.Id}".Contains(searchString))
+            return true;
+        return false;
+    }
+}
