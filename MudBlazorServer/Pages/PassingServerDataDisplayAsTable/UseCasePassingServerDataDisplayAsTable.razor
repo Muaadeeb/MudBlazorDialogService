@@ -21,7 +21,8 @@
 
     private async Task OpenDialog()
     {
-        var options = new DialogOptions() { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true};
+        //var options = new DialogOptions() { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true};
+        var options = new DialogOptions() { Position = DialogPosition.Center, MaxWidth = MaxWidth.Small, FullWidth = true };
         var dialog = _dialogService.Show<Dialog1Component>(string.Empty, options);
         var result = await dialog.Result;
 

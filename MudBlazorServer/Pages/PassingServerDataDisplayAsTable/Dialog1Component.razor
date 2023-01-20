@@ -21,7 +21,7 @@
         @if (HasData)
         {
             <MudItem>
-                <MudTable Items="@Inventory" SortLabel="Sort By" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ? "600px" : "")" Outlined="true" Virtualize="true" Hover="true" Dense="true" Bordered="true" Striped="true" Breakpoint="Breakpoint.Sm" Filter="new Func<Inventory, bool>(GetFilterItem)">
+                <MudTable Items="@Inventory" SortLabel="Sort By" FixedHeader="true" FixedFooter="true" Height="@("300px")" Outlined="true" Virtualize="true" Hover="true" Dense="true" Bordered="true" Striped="true" Breakpoint="Breakpoint.Sm" Filter="new Func<Inventory, bool>(GetFilterItem)">
                     <ToolBarContent>
                         <MudText Typo="Typo.h6">User Details</MudText>
                         <MudSpacer/>
@@ -49,8 +49,6 @@
                         <MudTablePager PageSizeOptions="new int[] { 5, 10, 20 }"/>
                     </PagerContent>
                 </MudTable>
-                <MudSwitch @bind-Checked="@fixed_header">Fixed Header</MudSwitch>
-                <MudSwitch @bind-Checked="@fixed_footer">Fixed Footer</MudSwitch>
             </MudItem>
         }
 
@@ -68,8 +66,6 @@
 
     public string SearchValue { get; set; } = null!;
     public bool HasData { get; set; }
-    private bool fixed_header = true;
-    private bool fixed_footer = false;
     private string searchItem = string.Empty;
 
 
@@ -78,7 +74,26 @@
         new Inventory{ Id = 1, Item = "Book1", Description = "Guide to Denmark" },
         new Inventory{ Id = 2, Item = "Book2", Description = "Guide to Sweden" },
         new Inventory{ Id = 3, Item = "Book3", Description = "Guide to Russia" },
-        new Inventory{ Id = 4, Item = "Book4", Description = "Guide to Germany" }
+        new Inventory{ Id = 4, Item = "Book4", Description = "Guide to Germany" },
+        new Inventory{ Id = 5, Item = "Book5", Description = "Guide to USA" },
+        new Inventory{ Id = 6, Item = "Book6", Description = "Guide to Canada" },
+        new Inventory{ Id = 7, Item = "Book7", Description = "Guide to Mexico" },
+        new Inventory{ Id = 8, Item = "Book8", Description = "Guide to Peru" },
+        new Inventory{ Id = 9, Item = "Book9", Description = "Guide to Guam" },
+        new Inventory{ Id = 10, Item = "Book10", Description = "Guide to Japan" },
+        new Inventory{ Id = 11, Item = "Book11", Description = "Guide to South Korea" },
+        new Inventory{ Id = 12, Item = "Book12", Description = "Guide to North Korea" },
+        new Inventory{ Id = 13, Item = "Book13", Description = "Guide to China" },
+        new Inventory{ Id = 14, Item = "Book14", Description = "Guide to Thailand" },
+        new Inventory{ Id = 15, Item = "Book15", Description = "Guide to India" },
+        new Inventory{ Id = 16, Item = "Book16", Description = "Guide to Iraq" },
+        new Inventory{ Id = 17, Item = "Book17", Description = "Guide to France" },
+        new Inventory{ Id = 18, Item = "Book18", Description = "Guide to Norway" },
+        new Inventory{ Id = 19, Item = "Book19", Description = "Guide to Sweden" },
+        new Inventory{ Id = 20, Item = "Book20", Description = "Guide to Finland" },
+        new Inventory{ Id = 21, Item = "Book21", Description = "Guide to Egypt" },
+        new Inventory{ Id = 22, Item = "Book22", Description = "Guide to Chad" },
+        new Inventory{ Id = 23, Item = "Book23", Description = "Guide to Libya" }
     };
 
     void Cancel() => MudDialog.Cancel();
@@ -103,7 +118,7 @@
     private async Task GetData()
     {
         HasData = false;
-        var result = Inventory.Where(x => x.Item.Contains(SearchValue)).ToList();
+        var result = Inventory.Where(x => x.Item.Contains(SearchValue, StringComparison.OrdinalIgnoreCase)).ToList();
         
         if (result.Any())
         {
